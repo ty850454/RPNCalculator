@@ -1,5 +1,5 @@
 
-[中文](blob/master/README-CN.MD)
+[中文](https://github.com/ty850454/RPNCalculator/blob/master/README-CN.MD)
 
 # programming exercise RPN calculator
 
