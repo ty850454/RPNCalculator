@@ -5,7 +5,8 @@ package com.dreammakerteam.calculator.exception;
  * @author xy
  */
 public class CalcInsufficientParametersException extends CalcException {
-    public CalcInsufficientParametersException(String command) {
-        super(command, "insufficient parameters");
+
+    public CalcInsufficientParametersException() {
+        super("insufficient parameters");
     }
 }

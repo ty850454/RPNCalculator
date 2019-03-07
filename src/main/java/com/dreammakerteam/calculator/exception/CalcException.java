@@ -1,14 +1,10 @@
 package com.dreammakerteam.calculator.exception;
 
+/**
+ * 异常父类
+ */
 public class CalcException extends RuntimeException {
-    private String operator;
-
-    public CalcException(String operator, String message) {
+    public CalcException(String message) {
         super(message);
-        this.operator = operator;
-    }
-
-    public String getOperator() {
-        return operator;
     }
 }

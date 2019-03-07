@@ -2,50 +2,60 @@ package com.dreammakerteam.calculator;
 
 import com.dreammakerteam.calculator.command.*;
 import com.dreammakerteam.calculator.exception.CalcException;
-import com.dreammakerteam.calculator.exception.CalcUnknownCommandException;
 import com.dreammakerteam.calculator.stack.CalcStack;
+import com.dreammakerteam.calculator.stack.CalcStackFormat;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
 /**
- * 计算器
+ * 计算器，控制输入输入以及调用命令解释器
  * @author xy
  */
 public class Calculator {
 
-    private CalcStack stack = new CalcStack();
-    private final List<CalcCommand> calcStrategies;
+    /** 命令解释器 */
+    private final CommandInterpreter commandInterpreter;
 
-
-    public Calculator(List<CalcCommand> calcStrategies) {
-        this.calcStrategies = calcStrategies;
+    private Calculator(CommandInterpreter commandInterpreter) {
+        this.commandInterpreter = commandInterpreter;
     }
 
+    /**
+     * 启动
+     */
     public static void start() {
-        List<CalcCommand> calcStrategies = Arrays.asList(
+        // 默认命令
+        List<CalcCommand> CalcCommands = Arrays.asList(
                 new NumberCommand(),
-                new AdditionCommand(),
-                new SubtractionCommand(),
-                new MultiplicationCommand(),
-                new DivisionCommand(),
-                new ClearCommand());
-        Calculator calculator = new Calculator(calcStrategies);
-        calculator.run();
-
-
-
+                new AddCommand(),
+                new SubtractCommand(),
+                new MultiplyCommand(),
+                new DivideCommand(),
+                new SqrtCommand(),
+                new ClearCommand(),
+                new UndoCommand());
+        // 新建实例并开始接收命令
+        CalcStack stack = new CalcStack();
+        CalcStackFormat calcStackFormat = new CalcStackFormat(stack, "0.##########");
+        Calculator calculator = new Calculator(new CommandInterpreter(stack,CalcCommands, calcStackFormat));
+        calculator.acceptCommand();
     }
 
-    public void run() {
+    /**
+     * 循环接收命令
+     */
+    private void acceptCommand() {
         for (String str = null; !"quit".equals(str);) {
-            output("stack：" + stack.toString());
-            output("请输入：");
-            commandProcessing(str = input());
+            try {
+                commandInterpreter.parseCommand(str = input());
+            } catch (CalcException e) {
+                output(e.getMessage());
+            }
+            output("stack: " + commandInterpreter.getStackFormat());
         }
     }
-
 
     private String input() {
         Scanner scan = new Scanner(System.in);
@@ -57,50 +67,5 @@ public class Calculator {
     }
 
 
-    private void commandProcessing(String commandStr) {
-        char[] chars = commandStr.toCharArray();
-        StringBuilder command = new StringBuilder();
 
-        int i = 1;
-        try {
-            for (char aChar : chars) {
-                if (aChar == ' ') {
-                    parseCommand(command);
-                    continue;
-                }
-                command.append(aChar);
-                ++i;
-            }
-            parseCommand(command);
-        } catch (CalcException e) {
-            output("operator " + command + " (position: " + (i - command.length()) + "): " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            output("未知异常：" + i);
-        }
-    }
-
-    private void parseCommand(StringBuilder command) {
-        if (command.length() > 0) {
-            calc(command.toString());
-            command.setLength(0);
-        }
-    }
-
-    private void calc(String command) {
-        CalcCommand calcCommand = getCalcStrategy(command);
-        if (calcCommand == null) {
-            throw new CalcUnknownCommandException(command);
-        }
-        calcCommand.calc(command, stack);
-    }
-
-    private CalcCommand getCalcStrategy(String command) {
-        for (CalcCommand calcCommand : calcStrategies) {
-            if (calcCommand.canUse(command)) {
-                return calcCommand;
-            }
-        }
-        return null;
-    }
 }

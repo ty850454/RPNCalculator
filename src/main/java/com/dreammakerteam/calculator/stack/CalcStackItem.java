@@ -1,7 +1,5 @@
 package com.dreammakerteam.calculator.stack;
 
-import com.dreammakerteam.calculator.CalcTypeEnum;
-
 import java.math.BigDecimal;
 
 /**
